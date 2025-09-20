@@ -1,0 +1,52 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+using namespace std;
+
+// Convert a string in base "base" to long long
+long long parseBase(const string& value, int base) {
+    long long result = 0;
+    for (char c: value) {
+        int digit;
+        if (isdigit(c)) digit = c - '0';
+        else if (isalpha(c)) digit = tolower(c) - 'a' + 10;
+        else throw invalid_argument("Invalid char in value");
+        result = result * base + digit;
+    }
+    return result;
+}
+
+// Lagrange interpolation at x=0, returns the constant coefficient
+long long lagrangeConstant(const vector<int>& x, const vector<long long>& y) {
+    double result = 0;
+    int n = x.size();
+    for (int i = 0; i < n; ++i) {
+        double term = (double)y[i];
+        for (int j = 0; j < n; ++j) {
+            if (i != j)
+                term *= (0.0 - x[j]) / (x[i] - x[j]);
+        }
+        result += term;
+    }
+    return llround(result);
+}
+
+int main() {
+    vector<int> x = {1,2,3,4,5,6,7}; // example first 7 x values
+    vector<string> base = {"6","15","15","16","8","3","3"};
+    vector<string> vals = {
+        "13444211440455345511",
+        "aed7015a346d635",
+        "6aeeb69631c227c",
+        "e1b5e05623d881f",
+        "316034514573652620673",
+        "2122212201122002221120200210011020220200",
+        "20120221122211000100210021102001201112121"
+    };
+    vector<long long> y;
+    for (int i = 0; i < x.size(); ++i) {
+        y.push_back(parseBase(vals[i], stoi(base[i])));
+    }
+    cout << "Constant term c = " << lagrangeConstant(x, y) << endl;
+}

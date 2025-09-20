@@ -1,0 +1,58 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <string>
+using namespace std;
+
+// Convert a given string number from base-N to decimal (long long)
+long long parseBase(const string& value, int base) {
+    long long result = 0;
+    for (char c : value) {
+        int digit;
+        if (isdigit(c)) digit = c - '0';
+        else digit = tolower(c) - 'a' + 10;
+        result = result * base + digit;
+    }
+    return result;
+}
+
+// Lagrange interpolation at x=0 to find the constant term
+long long lagrangeConstant(const vector<int>& x, const vector<long long>& y) {
+    double result = 0;
+    int n = x.size();
+    for (int i = 0; i < n; i++) {
+        double term = static_cast<double>(y[i]);
+        for (int j = 0; j < n; j++) {
+            if (i != j) {
+                term *= (0.0 - x[j]) / (x[i] - x[j]);
+            }
+        }
+        result += term;
+    }
+    return llround(result);
+}
+
+int main() {
+    // Test case input (hardcoded)
+    // keys.n = 4, keys.k = 3
+    // Roots as (x, {base, value})
+    vector<int> xs = {1, 2, 3};
+    vector<pair<int,string>> roots = {
+        {10, "4"},
+        {2, "111"},
+        {10, "12"},
+        // 4th root ignored (k=3)
+        // {4, "213"}
+    };
+
+    vector<long long> ys;
+    for (int i = 0; i < xs.size(); i++) {
+        ys.push_back(parseBase(roots[i].second, roots[i].first));
+    }
+
+    long long c = lagrangeConstant(xs, ys);
+
+    cout << c << endl;  // output constant term
+
+    return 0;
+}
